@@ -288,7 +288,7 @@ public class MainActivity extends Activity {
         box.setPadding(dp(20),0,dp(20),0);
 
         String[] labels={"Symbol","Entry","SL","TP","Pip"};
-        EditText[] f=new EditText[5];
+        EditText[] f=new EditText[4];
 
         for(int i=0;i<4;i++){
             f[i]=new EditText(this);
@@ -312,7 +312,6 @@ public class MainActivity extends Activity {
             f[1].setText(o.optString("entry"));
             f[2].setText(o.optString("sl"));
             f[3].setText(o.optString("tp"));
-            f[4].setText(o.optString("pip"));
             side.setSelection(o.optString("side").equals("SELL")?1:0);
             String st=o.optString("status");
             int p=Arrays.asList("OPEN","TP HIT","SL HIT","CLOSED").indexOf(st);
@@ -335,9 +334,9 @@ public class MainActivity extends Activity {
                 o.put("entry",f[1].getText().toString().trim());
                 o.put("sl",f[2].getText().toString().trim());
                 o.put("tp",f[3].getText().toString().trim());
-                o.put("pip",f[4].getText().toString().trim());
                 o.put("side",side.getSelectedItem().toString());
                 o.put("status",status.getSelectedItem().toString());
+                o.put("pip",calculatedPips(o));
 
                 if(o.optString("symbol").isEmpty()){
                     f[0].setError("Required");
