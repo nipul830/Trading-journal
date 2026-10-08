@@ -268,7 +268,8 @@ public class MainActivity extends Activity {
         double entry=num(o.optString("entry"));
         double hit=num(status.equals("TP HIT")?o.optString("tp"):o.optString("sl"));
         if(Double.isNaN(entry)||Double.isNaN(hit)) return Double.NaN;
-        return o.optString("side").equals("SELL") ? entry-hit : hit-entry;
+        double points = o.optString("side").equals("SELL") ? entry-hit : hit-entry;
+        return points * 10.0; // 1 point = 10 pips
     }
 
     String formatPips(double p){
