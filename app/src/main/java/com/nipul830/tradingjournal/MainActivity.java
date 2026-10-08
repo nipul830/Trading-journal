@@ -13,7 +13,9 @@ import java.util.*;
 
 public class MainActivity extends Activity {
     LinearLayout list;
+    LinearLayout bottomNav;
     ArrayList<JSONObject> trades = new ArrayList<>();
+    String selectedCategory = "GOLD";
     android.content.SharedPreferences prefs;
 
     final int BG = Color.rgb(246,248,251);
@@ -97,8 +99,44 @@ public class MainActivity extends Activity {
         scroll.addView(list);
         root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
 
+        bottomNav=new LinearLayout(this);
+        bottomNav.setOrientation(LinearLayout.HORIZONTAL);
+        bottomNav.setPadding(dp(8),dp(8),dp(8),dp(8));
+        bottomNav.setBackgroundColor(Color.WHITE);
+        root.addView(bottomNav,new LinearLayout.LayoutParams(-1,dp(70)));
+        addNavButton("GOLD", "Gold", 0);
+        addNavButton("BTC", "Bitcoin", 1);
+        addNavButton("FOREX", "Forex", 2);
+
         setContentView(root);
+        updateNav();
         render();
+    }
+
+    void addNavButton(String key,String label,int index){
+        Button b=new Button(this);
+        b.setText(label);
+        b.setAllCaps(false);
+        b.setTextSize(13);
+        b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
+        b.setOnClickListener(v->{selectedCategory=key; updateNav(); render();});
+        bottomNav.addView(b,new LinearLayout.LayoutParams(0,-1,1));
+    }
+
+    void updateNav(){
+        for(int i=0;i<bottomNav.getChildCount();i++){
+            Button b=(Button)bottomNav.getChildAt(i);
+            String key=i==0?"GOLD":i==1?"BTC":"FOREX";
+            b.setTextColor(key.equals(selectedCategory)?Color.WHITE:TEXT);
+            b.setBackground(bg(key.equals(selectedCategory)?ACCENT:Color.WHITE,12));
+        }
+    }
+
+    String categoryFor(String symbol){
+        String s=symbol.toUpperCase(Locale.US);
+        if(s.contains("GOLD")||s.contains("XAU")) return "GOLD";
+        if(s.contains("BTC")) return "BTC";
+        return "FOREX";
     }
 
     void load(){
@@ -123,7 +161,13 @@ public class MainActivity extends Activity {
     void render(){
         list.removeAllViews();
 
-        if(trades.isEmpty()){
+        ArrayList<JSONObject> visible=new ArrayList<>();
+        for(JSONObject o:trades){
+            String c=o.optString("category",categoryFor(o.optString("symbol")));
+            if(c.equals(selectedCategory)) visible.add(o);
+        }
+
+        if(visible.isEmpty()){
             LinearLayout empty=new LinearLayout(this);
             empty.setOrientation(LinearLayout.VERTICAL);
             empty.setGravity(Gravity.CENTER);
@@ -137,9 +181,9 @@ public class MainActivity extends Activity {
             return;
         }
 
-        for(int i=0;i<trades.size();i++){
-            final int ix=i;
-            JSONObject o=trades.get(i);
+        for(int i=0;i<visible.size();i++){
+            JSONObject o=visible.get(i);
+            final int ix=trades.indexOf(o);
 
             LinearLayout card=new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
@@ -169,7 +213,9 @@ public class MainActivity extends Activity {
             top.addView(sideView,sp);
             card.addView(top);
 
-            String result=calculatedPips(o);\n            int resultColor=result.startsWith("+")?Color.rgb(25,145,90):(result.equals("—")?MUTED:Color.rgb(205,65,65));\n            TextView line=text(symbol+"  |  "+side+"  |  "+entry+"  |  "+sl+"  |  "+tp+"  |  "+result+"  |  "+status,12,resultColor);
+            String result=calculatedPips(o);
+            int resultColor=result.startsWith("+")?Color.rgb(25,145,90):(result.equals("—")?MUTED:Color.rgb(205,65,65));
+            TextView line=text(symbol+"  |  "+side+"  |  "+entry+"  |  "+sl+"  |  "+tp+"  |  "+result+"  |  "+status,12,resultColor);
             line.setTypeface(Typeface.MONOSPACE,Typeface.NORMAL);
             line.setSingleLine(true);
             line.setPadding(0,dp(10),0,dp(8));
@@ -259,7 +305,9 @@ public class MainActivity extends Activity {
         d.setOnShowListener(x->d.getButton(-1).setOnClickListener(v->{
             try{
                 JSONObject o=edit<0?new JSONObject():trades.get(edit);
-                o.put("symbol",f[0].getText().toString().trim().toUpperCase());
+                String symbolInput=f[0].getText().toString().trim().toUpperCase();
+                o.put("symbol",symbolInput);
+                o.put("category",categoryFor(symbolInput));
                 o.put("entry",f[1].getText().toString().trim());
                 o.put("sl",f[2].getText().toString().trim());
                 o.put("tp",f[3].getText().toString().trim());
