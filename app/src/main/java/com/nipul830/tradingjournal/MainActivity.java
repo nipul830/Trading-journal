@@ -9,7 +9,7 @@ import android.widget.*;
 import org.json.*;
 import java.util.*;
 
-public class MainActivity extends Activity {
+public class MainActivity {
     LinearLayout list; ArrayList<JSONObject> trades = new ArrayList<>(); android.content.SharedPreferences prefs;
     int dp(float v){return (int)(v*getResources().getDisplayMetrics().density+0.5f);}
     TextView tv(String s,int size){ TextView t=new TextView(this); t.setText(s); t.setTextSize(size); t.setTextColor(Color.BLACK); t.setPadding(dp(16),dp(12),dp(16),dp(12)); return t; }
@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
         Spinner status=new Spinner(this); status.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,new String[]{"OPEN","TP HIT","SL HIT","CLOSED"})); box.addView(status);
         if(edit>=0){JSONObject o=trades.get(edit);f[0].setText(o.optString("symbol"));f[1].setText(o.optString("entry"));f[2].setText(o.optString("sl"));f[3].setText(o.optString("tp"));f[4].setText(o.optString("pip"));side.setSelection(o.optString("side").equals("SELL")?1:0);String st=o.optString("status");status.setSelection(Arrays.asList("OPEN","TP HIT","SL HIT","CLOSED").indexOf(st));}
         AlertDialog d=new AlertDialog.Builder(this).setTitle(edit<0?"Add Trade":"Edit Trade").setView(box).setNegativeButton("Cancel",null).setPositiveButton("Save",null).create();
-        d.setOnShowListener(x->d.getButton(-1).setOnClickListener(v->{try{JSONObject o=edit<0?new JSONObject():trades.get(edit);o.put("symbol",f[0].getText().toString().trim().toUpperCase());o.put("entry",f[1].getText().toString().trim());o.put("sl",f[2].getText().toString().trim());o.put("tp",f[3].getText().toString().trim());o.put("pip",f[4].getText().toString().trim());o.put("side",side.getSelectedItem().toString());o.put("status",status.getSelectedItem().toString());if(o.optString("symbol").isEmpty()){f[0].setError("Required");return;}if(edit<0)trades.add(0,o);save();render();d.dismiss();}catch(Exception e){Toast.makeText(this,"Could not save trade",Toast.LENGTH_SHORT).show();}});
+        d.setOnShowListener(x->d.getButton(-1).setOnClickListener(v->{try{JSONObject o=edit<0?new JSONObject():trades.get(edit);o.put("symbol",f[0].getText().toString().trim().toUpperCase());o.put("entry",f[1].getText().toString().trim());o.put("sl",f[2].getText().toString().trim());o.put("tp",f[3].getText().toString().trim());o.put("pip",f[4].getText().toString().trim());o.put("side",side.getSelectedItem().toString());o.put("status",status.getSelectedItem().toString());if(o.optString("symbol").isEmpty()){f[0].setError("Required");return;}if(edit<0)trades.add(0,o);save();render();d.dismiss();}catch(Exception e){Toast.makeText(this,"Could not save trade",Toast.LENGTH_SHORT).show();}}));
         d.show();
     }
 }
