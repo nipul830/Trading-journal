@@ -258,6 +258,30 @@ public class MainActivity extends Activity {
         }
     }
 
+    double num(String s){
+        try{return Double.parseDouble(s.trim().replace(",",""));}catch(Exception e){return Double.NaN;}
+    }
+
+    double tradePips(JSONObject o){
+        String status=o.optString("status");
+        if(!status.equals("TP HIT") && !status.equals("SL HIT")) return Double.NaN;
+        double entry=num(o.optString("entry"));
+        double hit=num(status.equals("TP HIT")?o.optString("tp"):o.optString("sl"));
+        if(Double.isNaN(entry)||Double.isNaN(hit)) return Double.NaN;
+        return o.optString("side").equals("SELL") ? entry-hit : hit-entry;
+    }
+
+    String formatPips(double p){
+        if(Math.abs(p-Math.rint(p))<0.000001) return String.valueOf((long)Math.rint(p));
+        return String.format(Locale.US,"%.2f",p);
+    }
+
+    String calculatedPips(JSONObject o){
+        double p=tradePips(o);
+        if(Double.isNaN(p)) return "—";
+        return (p>=0?"+":"")+formatPips(p);
+    }
+
     void dialog(int edit){
         LinearLayout box=new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
