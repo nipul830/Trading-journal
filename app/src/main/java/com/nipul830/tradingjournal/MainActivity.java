@@ -151,7 +151,7 @@ public class MainActivity extends Activity {
             String entry=value(o,"entry");
             String sl=value(o,"sl");
             String tp=value(o,"tp");
-            String pip=value(o,"pip");
+            String pip=calculatedPips(o);
             String status=value(o,"status");
 
             LinearLayout top=new LinearLayout(this);
@@ -169,7 +169,7 @@ public class MainActivity extends Activity {
             top.addView(sideView,sp);
             card.addView(top);
 
-            TextView line=text(symbol+"  |  "+side+"  |  "+entry+"  |  "+sl+"  |  "+tp+"  |  "+pip+"  |  "+status,12,TEXT);
+            String result=calculatedPips(o);\n            int resultColor=result.startsWith("+")?Color.rgb(25,145,90):(result.equals("—")?MUTED:Color.rgb(205,65,65));\n            TextView line=text(symbol+"  |  "+side+"  |  "+entry+"  |  "+sl+"  |  "+tp+"  |  "+result+"  |  "+status,12,resultColor);
             line.setTypeface(Typeface.MONOSPACE,Typeface.NORMAL);
             line.setSingleLine(true);
             line.setPadding(0,dp(10),0,dp(8));
@@ -179,7 +179,7 @@ public class MainActivity extends Activity {
             hs.addView(line);
             card.addView(hs);
 
-            TextView statusView=text(status,11,TEXT);
+            TextView statusView=text((status.equals("TP HIT")||status.equals("SL HIT"))?status+"  "+pip+" PIP":status,11,TEXT);
             statusView.setTypeface(Typeface.DEFAULT,Typeface.BOLD);
             statusView.setGravity(Gravity.CENTER);
             statusView.setPadding(dp(12),0,dp(12),0);
@@ -220,7 +220,7 @@ public class MainActivity extends Activity {
         String[] labels={"Symbol","Entry","SL","TP","Pip"};
         EditText[] f=new EditText[5];
 
-        for(int i=0;i<5;i++){
+        for(int i=0;i<4;i++){
             f[i]=new EditText(this);
             f[i].setHint(labels[i]);
             f[i].setSingleLine(true);
