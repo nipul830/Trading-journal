@@ -9,7 +9,7 @@ import android.widget.*;
 import org.json.*;
 import java.util.*;
 
-public class MainActivity {
+public class MainActivity extends Activity {
     LinearLayout list; ArrayList<JSONObject> trades = new ArrayList<>(); android.content.SharedPreferences prefs;
     int dp(float v){return (int)(v*getResources().getDisplayMetrics().density+0.5f);}
     TextView tv(String s,int size){ TextView t=new TextView(this); t.setText(s); t.setTextSize(size); t.setTextColor(Color.BLACK); t.setPadding(dp(16),dp(12),dp(16),dp(12)); return t; }
